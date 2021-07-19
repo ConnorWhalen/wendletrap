@@ -1,0 +1,26 @@
+sm_filename
+title
+subtitle
+artist
+genre
+author
+banner_image
+background_image
+icon_image
+audio_file
+offset_secs
+sample_start_secs
+sample_length_secs
+display_bpm (float for single or float:float for range)
+
+author
+difficulty_name (one of Beginner, Easy, Medium, Hard, Challenge, Edit)
+difficulty_number
+midi_filename
+
+author
+difficulty_name
+difficulty_number
+midi_filename
+
+and so on...
