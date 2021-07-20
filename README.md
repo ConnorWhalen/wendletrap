@@ -30,3 +30,5 @@ Roll | 38 (D1) | 41 (F1) | 44 (G#1) | 47 (B1)
 The length of the midi note will be used to set the length of hold and roll notes.
 
 A wendletrap-designed MIDI file will not be especially musical.
+
+Tempo and Time Signature changes will be pulled from the MIDI file. Time signatures must be over 4.
