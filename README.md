@@ -19,7 +19,11 @@ I strongly recommend creating a songs folder and within that folder creating a f
 
 ### MIDI Format
 
-#### Stepmanie (sm) Files
+A wendletrap-designed MIDI file will not be especially musical.
+
+Tempo and Time Signature changes will be pulled from the MIDI file. Time signatures must be over 4.
+
+#### Stepmania (sm) Files
 
 wendletrap maps specific MIDI pitches to different stepmania notes. The mapping is:
 
@@ -44,6 +48,3 @@ The length of the midi note will be used to set the length of hold notes and the
 
 HOPOs and taps are done by pairing a normal/hold note with the HOPO/tap note.
 
-A wendletrap-designed MIDI file will not be especially musical.
-
-Tempo and Time Signature changes will be pulled from the MIDI file. Time signatures must be over 4.
