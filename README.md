@@ -37,8 +37,8 @@ The mapping for clone hero is:
 
 Note Type | Purple | Green | Red | Yellow | Blue | Orange | HOPO | Tap | Star Power
 --------- | ------ | ----- | --- | ------ | ---- | ------ | ---- | --- | ----------
-Normal | 36 | 38 | 40 | 42 | 44 | 46 | 48 | 49 | x
-Hold | 37 | 39 | 41 | 43 | 45 | 47 | x | x | 50
+Normal | 36 (C1) | 38 (D1) | 40 (E1) | 42 (F#1) | 44 (G#1) | 46 (A#1) | 48 (C2) | 49 (C#2) | x
+Hold | 37 (C#1) | 39 (D#1) | 41 (F1) | 43 (G1) | 45 (A1) | 47 (B1) | x | x | 50 (D2)
 
 The length of the midi note will be used to set the length of hold notes and the star power region.
 
