@@ -22,18 +22,36 @@ META_TIME_SIG_EVENT = 0x58
 TICKS_PER_SECOND = 0
 TICKS_PER_BEAT = 1
 
-NOTE_LANE_MAP = {
+SM_NOTE_LANE_MAP = {
+	# notes
 	36: 0, 39: 1,
 	42: 2, 45: 3,
+	# hold notes
 	37: 4, 40: 5,
 	43: 6, 46: 7,
+	# mash notes
 	38: 8, 41: 9,
 	44: 10, 47: 11,
 }
-HOLD_NOTES = [37, 38, 40, 41, 43, 44, 46, 47]
+SM_HOLD_NOTES = [37, 38, 40, 41, 43, 44, 46, 47]
+
+CHART_NOTE_LANE_MAP = {
+	# notes
+	36: 7, 38: 0,
+	40: 1, 42: 2,
+	44: 3, 46: 4,
+	# hold notes
+	37: 7, 39: 0,
+	41: 1, 43: 2,
+	45: 3, 47: 4,
+	# FX
+	48: 5, 49: 6,
+	50: 8
+}
+CHART_HOLD_NOTES = [37, 39, 41, 43, 45, 47, 50]
 
 
-def parse_file(filename):
+def parse_file(filename, type_="sm"):
 	"""
 		note_starts is:
 		[
@@ -64,6 +82,12 @@ def parse_file(filename):
 	tempos = []
 	time_sigs = []
 	file_length = os.path.getsize(filename)
+	if type_ == "sm":
+		note_lane_map = SM_NOTE_LANE_MAP
+		hold_notes = SM_HOLD_NOTES
+	elif type_ == "chart":
+		note_lane_map = CHART_NOTE_LANE_MAP
+		hold_notes = CHART_HOLD_NOTES
 	with open(filename, 'rb') as file_:
 		# Header Chunk
 		header_chunk_size = parse_chunk_id_and_length(file_, HEADER_CHUNK_ID)
@@ -127,15 +151,15 @@ def parse_file(filename):
 			if event_type == NOTE_OFF_EVENT:
 				note_number = event_param_1
 				velocity = read_byte(file_)
-				if note_number in HOLD_NOTES:
-					note_starts.append([NOTE_LANE_MAP[note_number], hold_note_starts[note_number], current_beat])
+				if note_number in hold_notes:
+					note_starts.append([note_lane_map[note_number], hold_note_starts[note_number], current_beat])
 			elif event_type == NOTE_ON_EVENT:
 				note_number = event_param_1
 				velocity = read_byte(file_)
-				if note_number in HOLD_NOTES:
+				if note_number in hold_notes:
 					hold_note_starts[note_number] = current_beat
 				else:
-					note_starts.append([NOTE_LANE_MAP[note_number], current_beat, 0])
+					note_starts.append([note_lane_map[note_number], current_beat, 0])
 			elif event_type == NOTE_AFTERTOUCH_EVENT:
 				note_number = event_param_1
 				aftertouch_value = read_byte(file_)

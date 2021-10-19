@@ -1,26 +1,32 @@
-sm_filename
-title
-subtitle
-artist
-genre
-author
-banner_image
-background_image
-icon_image
-audio_file
-offset_secs
-sample_start_secs
-sample_length_secs
-display_bpm (float for single or float:float for range)
+file: 
+  filename: "sample.sm" # sm only
+  title: ""
+  subtitle: "" # sm only
+  artist: ""
+  genre: ""
+  author: ""
+  banner_image: "image.png" # sm only
+  background_image: "image.png" # sm only
+  icon_image: "image.png" # sm only
+  audio_file: "song.ogg" # sm only
+  offset_secs: 1.23
+  sample_start_secs: 12
+  sample_length_secs: 30 # sm only
+  display_bpm: "120:130" # sm only. float for single or float:float for range
+  album: "" # chart only
+  year: "" # chart only
+  song_length_secs: 140 # chart only
+  difficulty_number: 3 # chart only
 
-author
-difficulty_name (one of Beginner, Easy, Medium, Hard, Challenge, Edit)
-difficulty_number
-midi_filename
+charts:
+  - author: "" # sm only
+    difficulty_name: "" # sm only. one of Beginner, Easy, Medium, Hard, Challenge, Edit
+    difficulty_number: 1 # sm only
+    midi_filename: "filename.mid"
 
-author
-difficulty_name
-difficulty_number
-midi_filename
+  - author: ""
+    difficulty_name: ""
+    difficulty_number: 1
+    midi_filename: "filename.mid"
 
-and so on...
+    # and so on...
