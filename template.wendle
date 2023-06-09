@@ -18,7 +18,7 @@ file:
   song_length_secs: 140 # chart only
   difficulty_number: 3 # chart only
 
-charts:
+sm_charts:
   - author: "" # sm only
     difficulty_name: "" # sm only. one of Beginner, Easy, Medium, Hard, Challenge, Edit
     difficulty_number: 1 # sm only
@@ -29,4 +29,9 @@ charts:
     difficulty_number: 1
     midi_filename: "filename.mid"
 
+    # and so on...
+
+chart_charts:
+  - midi_filename: "filename.mid"
+  - midi_filename: "filename.mid"
     # and so on...
