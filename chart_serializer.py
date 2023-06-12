@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-import midi_parser
+import midi_parser as midi_parser
 
 STAR_POWER_LANE = 8
 
@@ -109,7 +109,7 @@ def serialize_file(file_data, charts_data):
 				note_lane = 2
 			else:
 				note_type = "N"
-			file_.write(f"  {write_measure_number(note_start_measure)} = N {note_lane} {write_measure_number(note_length)}\n")
+			file_.write(f"  {write_measure_number(note_start_measure)} = {note_type} {note_lane} {write_measure_number(note_length)}\n")
 
 		file_.write("}\n")
 
@@ -120,6 +120,7 @@ def serialize_file(file_data, charts_data):
 		file_.write("[song]\n")
 		file_.write(f"name = {file_data['title']}\n")
 		file_.write(f"artist = {file_data['artist']}\n")
+		file_.write(f"album = {file_data['album']}\n")
 		file_.write(f"genre = {file_data['genre']}\n")
 		file_.write(f"year = {file_data['year']}\n")
 		file_.write(f"diff_band = -1\n")

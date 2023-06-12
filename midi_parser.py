@@ -1,3 +1,4 @@
+from collections import defaultdict
 import os.path
 import struct
 
@@ -133,7 +134,7 @@ def parse_file(filename, type_="sm"):
 		event_channel = 0
 		event_param_1 = 0
 		current_beat = 0.0
-		hold_note_starts = {37: 0, 39: 0, 42: 0, 44: 0, 49: 0, 51: 0, 54: 0, 56: 0, 34: 0, 46: 0}
+		hold_note_starts = defaultdict(0)
 		while file_.tell() < file_length-1:
 			event_delta_time = float(parse_variable_length(file_))
 			if time_division_mode == TICKS_PER_SECOND:
@@ -205,6 +206,8 @@ def parse_file(filename, type_="sm"):
 						meta_event_byte = read_byte(file_)
 			else:
 				print(f"UNRECOGNIZED EVENT TYPE {event_type}")
+
+	time_sigs[0][1] = 0.0
 	return note_starts, tempos, time_sigs
 
 

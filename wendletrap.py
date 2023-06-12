@@ -13,13 +13,11 @@
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-import os.path
-
 import click
 import yaml
 
-import chart_serializer
-import sm_serializer
+import chart_serializer, sm_serializer
+
 
 @click.command()
 @click.option('--filename', help='input .wendle file.', prompt=True)
@@ -44,7 +42,7 @@ def create_sm(filename):
 		source_data = yaml.safe_load(wendle_file)
 
 		source_file_data = source_data["file"]
-		source_charts_data = source_data["charts"]
+		source_charts_data = source_data["sm_charts"]
 
 		sm_filename = source_file_data["filename"]
 		file_data["title"] = source_file_data.get("title", "")
@@ -83,7 +81,7 @@ def create_chart(filename):
 		source_data = yaml.safe_load(wendle_file)
 
 		source_file_data = source_data["file"]
-		source_charts_data = source_data["charts"]
+		source_charts_data = source_data["chart_charts"]
 
 		file_data["title"] = source_file_data.get("title", "")
 		file_data["artist"] = source_file_data.get("artist", "")

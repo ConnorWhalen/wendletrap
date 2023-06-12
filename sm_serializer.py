@@ -1,4 +1,4 @@
-import midi_parser
+import midi_parser as midi_parser
 
 NO_NOTE_CODE = 0
 NOTE_CODE = 1
@@ -62,13 +62,16 @@ def serialize_file(filename, file_data, charts_data):
 		file_.write(f"#SAMPLESTART:{file_data['sample_start_secs']};\n")
 		file_.write(f"#SAMPLELENGTH:{file_data['sample_length_secs']};\n")
 		file_.write(f"#SELECTABLE:YES;\n")
-		if len(file_data['display_bpm']) > 0:
+		if file_data['display_bpm'] is not None:
 			file_.write(f"#DISPLAYBPM:{file_data['display_bpm']};\n")
-		_, tempos, _ = midi_parser.parse_file(charts_data[0]["midi_filename"])
+		print(charts_data[0]["midi_filename"])
+		_, tempos, time_sigs = midi_parser.parse_file(charts_data[0]["midi_filename"])
+		# A sm measure is a bar of 4/4 so gotta scale it
+		tempos = scale_tempos(tempos, time_sigs)
 		bpms_line = "#BPMS:"
 		for i in range(len(tempos)):
 			tempo = tempos[i]
-			bpms_line += f"{tempo[1]}={tempo[0]}"
+			bpms_line += f"{make_beat_4_4(tempo[1], time_sigs)}={tempo[0]}"
 			if i < len(tempos)-1:
 				bpms_line += ",\n"
 			else:
@@ -83,6 +86,11 @@ def serialize_file(filename, file_data, charts_data):
 		for chart_data in charts_data:
 			print(f"writing chart {chart_data['midi_filename']}...")
 			note_starts, tempos, time_sigs = midi_parser.parse_file(chart_data["midi_filename"])
+			# A sm measure is a bar of 4/4 so gotta scale it
+			print(tempos)
+			print(time_sigs)
+			tempos = scale_tempos(tempos, time_sigs)
+			print(tempos)
 			write_chart(
 				file_,
 				chart_data["author"],
@@ -109,6 +117,7 @@ def write_chart(file_, author, difficulty_name, difficulty_number, note_starts, 
 	current_measure = 0
 
 	note_starts = beats_to_measures(note_starts, time_sigs)
+
 	while len(note_starts) > 0:
 		note_starts = write_measure(file_, note_starts, current_measure)
 		if len(note_starts) > 0:
@@ -167,6 +176,71 @@ def write_measure(file_, note_starts, current_measure):
 		file_.write(f"{lane_input[0]}{lane_input[1]}{lane_input[2]}{lane_input[3]}\n")
 
 	return note_starts
+
+
+def scale_tempos(_tempos, _time_sigs):
+	tempos = _tempos[:]
+	time_sigs = _time_sigs[:]
+
+	new_tempos = []
+	current_measure = 0
+	current_tempo = tempos.pop(0)[0]
+	current_time_sig = time_sigs.pop(0)[0]
+	record_tempo(new_tempos, current_tempo, current_time_sig, current_measure)
+	while len(tempos) > 0 and len(time_sigs) > 0:
+		if len(tempos) > 0:
+			if len(time_sigs) == 0 or tempos[0][1] < time_sigs[0][1]:
+				current_measure = tempos[0][1]
+				current_tempo = tempos[0][0]
+				record_tempo(new_tempos, current_tempo, current_time_sig, current_measure)
+				tempos.pop(0)
+			elif tempos[0][1] == time_sigs[0][1]:
+				current_measure = tempos[0][1]
+				current_tempo = tempos[0][0]
+				current_time_sig = time_sigs[0][0]
+				tempos.pop(0)
+				time_sigs.pop(0)
+				record_tempo(new_tempos, current_tempo, current_time_sig, current_measure)
+		if len(time_sigs) > 0:
+			if len(tempos) == 0 or time_sigs[0][1] < tempos[0][1]:
+				current_measure = time_sigs[0][1]
+				current_time_sig = time_sigs[0][0]
+				time_sigs.pop(0)
+				record_tempo(new_tempos, current_tempo, current_time_sig, current_measure)
+	return new_tempos
+
+
+def record_tempo(new_tempos, tempo, time_sig, measure):
+	new_tempos.append(
+		[tempo*4/time_sig,
+		measure]
+	)
+	# 120 bpm
+	# measure is 4 beats
+	# 4 beats / 120 bpm = 1/30 m = 2 s
+
+	# 120 bpm
+	# measure is 6 beats
+	# 6 beats / 120 bpm = 1/20 bpm = 3 s
+	# convert to 4 beats
+	# 4 beats / 3 s = 4 * 20 bpm = 80 bpm
+
+	# time_sig / tempo
+	# 4 / (time_sig/tempo) = tempo * 4 / time_sig
+
+
+def make_beat_4_4(beat_value, time_sigs):
+	measure = 0
+	beat = beat_value
+	for i in range(len(time_sigs)):
+		time_sig = time_sigs[i]
+		if i == len(time_sigs) - 1 or beat_value < time_sigs[i+1][1]:
+			measure += beat * 4 / time_sig[0]
+			break
+		else:
+			measure += (time_sigs[i+1][1] - time_sig[1]) * 4 / time_sig[0]
+			beat -= time_sigs[i+1][1] - time_sig[1]
+	return measure
 
 
 def beats_to_measures(note_starts, time_sigs):
