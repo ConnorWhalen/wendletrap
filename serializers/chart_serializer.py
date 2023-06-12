@@ -1,36 +1,35 @@
 from copy import deepcopy
+from dataclasses import dataclass
+from typing import Any
 
 import parsers.midi_parser as midi_parser
 
+
 STAR_POWER_LANE = 8
 
-def serialize_file(file_data, charts_data):
-	"""
-		Write chart file notes.chart and ini file song.ini.
 
-		file_data is:
-		{
-			title: str
-			artist: str
-			genre: str
-			author: str
-			offset_secs: float
-			sample_start_secs: float
+@dataclass
+class ChartFileData:
+	title: str
+	artist: str
+	genre: str
+	author: str
+	offset_secs: float
+	sample_start_secs: float
 
-			album: str
-			year: str
+	album: str
+	year: str
 
-			song_length_secs: str
-			difficulty_number: str
-		}
+	song_length_secs: str
+	difficulty_number: str
 
-		charts_data is:
-		[
-			{
-				midi_filename: str
-			}
-		]
-	"""
+
+@dataclass
+class ChartChartData:
+	midi_filename: str
+
+
+def serialize_file(file_data: ChartFileData, charts_data: list[ChartChartData]) -> None:
 	print(f"writing chart file...")
 	with open("notes.chart", "w") as file_:
 		file_.write("[Song]\n")
@@ -142,9 +141,9 @@ def serialize_file(file_data, charts_data):
 	print(f"ini file complete!")
 
 
-def write_measure_number(number_str):
+def write_measure_number(number_str: str) -> int:
 	return int(float(number_str)*192)
 
 
-def write_3_decimal_number(number_str):
+def write_3_decimal_number(number_str: str) -> int:
 	return int(float(number_str)*1000)

@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Any
+
 import parsers.midi_parser as midi_parser
 
 NO_NOTE_CODE = 0
@@ -12,37 +15,34 @@ MEASURE_THRESHOLD = 1 - (1/284) # half a 192 note as buffer
 hold_note_ends = [-1, -1, -1, -1]
 
 
-def serialize_file(filename, file_data, charts_data):
-	"""
-		Write sm file to filename.
+@dataclass
+class SmFileData:
+	sm_filename: str
+	title: str
+	subtitle: str
+	artist: str
+	genre: str
+	author: str
+	banner_image: str
+	background_image: str
+	icon_image: str
+	audio_file: str
+	offset_secs: float
+	sample_start_secs: float
+	sample_length_secs: float
+	display_bpm: str
 
-		file_data is:
-		{
-			title: str
-			subtitle: str
-			artist: str
-			genre: str
-			author: str
-			banner_image: str
-			background_image: str
-			icon_image: str
-			audio_file: str
-			offset_secs: float
-			sample_start_secs: float
-			sample_length_secs: float
-			display_bpm: str
-		}
 
-		charts_data is:
-		[
-			{
-				author: str
-				difficulty_name: str
-				difficulty_number: int
-				midi_filename: str
-			}
-		]
-	"""
+@dataclass
+class SmChartData:
+	author: str
+	difficulty_name: str
+	difficulty_number: int
+	midi_filename: str
+
+
+def serialize_file(file_data: SmFileData, charts_data: list[SmChartData]):
+	filename = file_data["sm_filename"]
 	print(f"writing stepfile {filename}...")
 	with open(filename, "w") as file_:
 		file_.write(f"#TITLE:{file_data['title']};\n")

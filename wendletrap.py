@@ -16,7 +16,8 @@
 import click
 import yaml
 
-from serializers import chart_serializer, sm_serializer
+from serializers.chart_serializer import serialize_file as serialize_chart, ChartChartData, ChartFileData
+from serializers.sm_serializer import serialize_file as serialize_sm, SmChartData, SmFileData
 
 
 @click.command()
@@ -44,31 +45,33 @@ def create_sm(filename):
 		source_file_data = source_data["file"]
 		source_charts_data = source_data["sm_charts"]
 
-		sm_filename = source_file_data["filename"]
-		file_data["title"] = source_file_data.get("title", "")
-		file_data["subtitle"] = source_file_data.get("subtitle", "")
-		file_data["artist"] = source_file_data.get("artist", "")
-		file_data["genre"] = source_file_data.get("genre", "")
-		file_data["author"] = source_file_data.get("author", "")
-		file_data["banner_image"] = source_file_data.get("banner_image", "")
-		file_data["background_image"] = source_file_data.get("background_image", "")
-		file_data["icon_image"] = source_file_data.get("icon_image", "")
-		file_data["audio_file"] = source_file_data["audio_file"]
-		file_data["offset_secs"] = float(source_file_data.get("offset_secs", 0))
-		file_data["sample_start_secs"] = float(source_file_data.get("sample_start_secs", 0))
-		file_data["sample_length_secs"] = float(source_file_data.get("sample_length_secs", 30))
-		file_data["display_bpm"] = source_file_data.get("display_bpm", "")
+		file_data = SmFileData(
+			sm_filename=source_file_data["sm_filename"]
+			title=source_file_data.get("title", ""),
+			subtitle=source_file_data.get("subtitle", ""),
+			artist=source_file_data.get("artist", ""),
+			genre=source_file_data.get("genre", ""),
+			author=source_file_data.get("author", ""),
+			banner_image=source_file_data.get("banner_image", ""),
+			background_image=source_file_data.get("background_image", ""),
+			icon_image=source_file_data.get("icon_image", ""),
+			audio_file=source_file_data["audio_file"],
+			offset_secs=float(source_file_data.get("offset_secs", 0)),
+			sample_start_secs=float(source_file_data.get("sample_start_secs", 0)),
+			sample_length_secs=float(source_file_data.get("sample_length_secs", 30)),
+			display_bpm=source_file_data.get("display_bpm", ""),
+		)
 
-		for source_chart_data in source_charts_data:
-			chart_data = {}
-			chart_data["author"] = source_chart_data.get("author", "")
-			chart_data["difficulty_name"] = source_chart_data.get("difficulty_name", "")
-			chart_data["difficulty_number"] = int(source_chart_data.get("difficulty_number", 0))
-			chart_data["midi_filename"] = source_chart_data["midi_filename"]
-			charts_data.append(chart_data)
+		charts_data = [
+			SmChartData(
+				author=source_chart_data.get("author", ""),
+				difficulty_name=source_chart_data.get("difficulty_name", ""),
+				difficulty_number=int(source_chart_data.get("difficulty_number", 0)),
+				midi_filename=source_chart_data["midi_filename"],
+			) for source_chart_data in source_charts_data
+		]
 
-	sm_serializer.serialize_file(
-		sm_filename,
+	serialize_sm(
 		file_data,
 		charts_data
 	)
@@ -83,25 +86,26 @@ def create_chart(filename):
 		source_file_data = source_data["file"]
 		source_charts_data = source_data["chart_charts"]
 
-		file_data["title"] = source_file_data.get("title", "")
-		file_data["artist"] = source_file_data.get("artist", "")
-		file_data["genre"] = source_file_data.get("genre", "")
-		file_data["author"] = source_file_data.get("author", "")
-		file_data["offset_secs"] = float(source_file_data.get("offset_secs", 0))
-		file_data["sample_start_secs"] = float(source_file_data.get("sample_start_secs", 0))
+		file_data = ChartFileData(
+			title=source_file_data.get("title", ""),
+			artist=source_file_data.get("artist", ""),
+			genre=source_file_data.get("genre", ""),
+			author=source_file_data.get("author", ""),
+			offset_secs=float(source_file_data.get("offset_secs", 0)),
+			sample_start_secs=float(source_file_data.get("sample_start_secs", 0)),
+			album=source_file_data.get("album", ""),
+			year=source_file_data.get("year", ""),
+			song_length_secs=float(source_file_data.get("song_length_secs", 0)),
+			difficulty_number=source_file_data.get("difficulty_number", ""),
+		)
 
-		file_data["album"] = source_file_data.get("album", "")
-		file_data["year"] = source_file_data.get("year", "")
+		chart_data = [
+			ChartChartData(
+				midi_filename=source_chart_data["midi_filename"]
+			) for source_chart_data in source_charts_data
+		]
 
-		file_data["song_length_secs"] = float(source_file_data.get("song_length_secs", 0))
-		file_data["difficulty_number"] = source_file_data.get("difficulty_number", "")
-
-		for source_chart_data in source_charts_data:
-			chart_data = {}
-			chart_data["midi_filename"] = source_chart_data["midi_filename"]
-			charts_data.append(chart_data)
-
-	chart_serializer.serialize_file(
+	serialize_chart(
 		file_data,
 		charts_data
 	)

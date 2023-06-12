@@ -1,7 +1,6 @@
-from collections import defaultdict
 import os.path
 import struct
-
+from collections import defaultdict
 
 HEADER_CHUNK_ID = 0x4D546864
 TRACK_CHUNK_ID = 0x4D54726B
