@@ -1,4 +1,4 @@
-import midi_parser as midi_parser
+import parsers.midi_parser as midi_parser
 
 NO_NOTE_CODE = 0
 NOTE_CODE = 1

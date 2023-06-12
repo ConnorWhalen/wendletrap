@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-import midi_parser as midi_parser
+import parsers.midi_parser as midi_parser
 
 STAR_POWER_LANE = 8
 

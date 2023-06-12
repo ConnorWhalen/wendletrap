@@ -16,7 +16,7 @@
 import click
 import yaml
 
-import chart_serializer, sm_serializer
+from serializers import chart_serializer, sm_serializer
 
 
 @click.command()
