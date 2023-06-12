@@ -46,7 +46,7 @@ def create_sm(filename):
 		source_charts_data = source_data["sm_charts"]
 
 		file_data = SmFileData(
-			sm_filename=source_file_data["sm_filename"]
+			sm_filename=source_file_data["sm_filename"],
 			title=source_file_data.get("title", ""),
 			subtitle=source_file_data.get("subtitle", ""),
 			artist=source_file_data.get("artist", ""),
@@ -99,7 +99,7 @@ def create_chart(filename):
 			difficulty_number=source_file_data.get("difficulty_number", ""),
 		)
 
-		chart_data = [
+		charts_data = [
 			ChartChartData(
 				midi_filename=source_chart_data["midi_filename"]
 			) for source_chart_data in source_charts_data
