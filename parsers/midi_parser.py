@@ -133,13 +133,15 @@ def parse_file(filename, type_="sm"):
 		event_channel = 0
 		event_param_1 = 0
 		current_beat = 0.0
-		hold_note_starts = defaultdict(0)
+		current_tempo = None
+		current_time_sig = (4, 4)
+		hold_note_starts = defaultdict(lambda: 0)
 		while file_.tell() < file_length-1:
 			event_delta_time = float(parse_variable_length(file_))
 			if time_division_mode == TICKS_PER_SECOND:
 				current_beat += (event_delta_time / ticks_per_frame) / frames_per_second
 			else: # time_division_mode == TICKS_PER_BEAT
-				current_beat += event_delta_time / ticks_per_beat
+				current_beat += (event_delta_time * current_time_sig[1]/4) / ticks_per_beat
 
 			split_byte = read_byte(file_)
 			if split_byte >= 0x80:
@@ -148,6 +150,7 @@ def parse_file(filename, type_="sm"):
 				event_param_1 = read_byte(file_)
 			else:
 				event_param_1 = split_byte
+
 			if event_type == NOTE_OFF_EVENT:
 				note_number = event_param_1
 				velocity = read_byte(file_)
@@ -156,10 +159,14 @@ def parse_file(filename, type_="sm"):
 			elif event_type == NOTE_ON_EVENT:
 				note_number = event_param_1
 				velocity = read_byte(file_)
-				if note_number in hold_notes:
-					hold_note_starts[note_number] = current_beat
+				if velocity == 0:
+					if note_number in hold_notes:
+						note_starts.append([note_lane_map[note_number], hold_note_starts[note_number], current_beat])
 				else:
-					note_starts.append([note_lane_map[note_number], current_beat, 0])
+					if note_number in hold_notes:
+						hold_note_starts[note_number] = current_beat
+					else:
+						note_starts.append([note_lane_map[note_number], current_beat, 0])
 			elif event_type == NOTE_AFTERTOUCH_EVENT:
 				note_number = event_param_1
 				aftertouch_value = read_byte(file_)
@@ -179,7 +186,7 @@ def parse_file(filename, type_="sm"):
 			elif event_type == META_EVENT:
 				meta_event_type = event_param_1
 				meta_event_length = parse_variable_length(file_)
-				print(f"META EVENT {meta_event_type} of length {meta_event_length}")
+				print(f"META EVENT {meta_event_type} of length {meta_event_length} at beat {current_beat}")
 				if meta_event_type == META_TEMPO_EVENT:
 					if meta_event_length != 3:
 						print("TEMPO PANIC " + str(meta_event_length))
@@ -188,18 +195,21 @@ def parse_file(filename, type_="sm"):
 						us_per_quarter *= 256
 						us_per_quarter += read_byte(file_)
 					tempo = 60.0 * 1000 * 1000 / us_per_quarter
-					if len(tempos) == 0:
-						tempos.append([tempo, 0.0])
-					else:
-						tempos.append([tempo, current_beat])
+					set_tempo(tempos, tempo, current_beat, current_time_sig[1])
+					current_tempo = tempo
 				elif meta_event_type == META_TIME_SIG_EVENT:
 					if meta_event_length != 4:
 						print("TIME SIG PANIC " + str(meta_event_length))
 					numerator = read_byte(file_)
-					denominator = read_byte(file_) # only using numerator
+					denominator = pow(2,read_byte(file_)) # only using numerator
+
+					if current_tempo:
+						set_tempo(tempos, current_tempo, current_beat, denominator)
+
 					read_byte(file_)
 					read_byte(file_)
 					time_sigs.append([numerator, current_beat])
+					current_time_sig = (numerator, denominator)
 				else:
 					for i in range(meta_event_length):
 						meta_event_byte = read_byte(file_)
@@ -235,3 +245,14 @@ def read_short(file_):
 
 def read_int(file_):
 	return struct.unpack('>I', file_.read(4))[0]
+
+def set_tempo(tempos, current_tempo, current_beat, time_sig_denominator):
+	denominator_tempo = current_tempo * time_sig_denominator/4
+	if not tempos:
+		tempos.append([denominator_tempo, 0.0])
+	else:
+		if tempos[-1][0] != denominator_tempo:
+			if tempos[-1][1] == current_beat:
+				tempos[-1][0] = denominator_tempo
+			else:
+				tempos.append([denominator_tempo, current_beat])
