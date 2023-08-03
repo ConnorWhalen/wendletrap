@@ -1,5 +1,9 @@
 # wendletrap
-A script that creates stepmania and clone hero files from midi data
+A script that creates stepmania and clone hero files from midi data.
+
+There are editors out there that make charting easier than editing midi, but none of them run on MacOS : (. Wendletrap lets you create charts in your daw or piano roll tool of choice. It requires purpose-built midi data and won't work with actual midi tracks from songs.
+
+I recommend using a visualizer like [Chart Hero](https://nb48.github.io/chart-hero/) or Stepmania's built-in preview for reviewing your work, since it's hard not to make mistakes working this way.
 
 ## Setup
 This script was developed using python 3.9.1.
@@ -21,7 +25,7 @@ I strongly recommend creating a songs folder and within that folder creating a f
 
 A wendletrap-designed MIDI file will not be especially musical.
 
-Tempo and Time Signature changes will be pulled from the MIDI file. Time signatures must be over 4.
+Tempo and Time Signature changes will be pulled from the MIDI file.
 
 #### Stepmania (sm) Files
 
